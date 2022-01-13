@@ -46,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var commPass = await spFunc.getStringValuesSF('commPass') ?? 'null';
     //debugPrint('------------------>${commPass.toString()}');
     if ((commPass != 'null')&&(commPass != null)) {
-      Navigator.pushReplacementNamed(context, '/dashB');
+      Navigator.pushNamed(context, '/dashB');
     }
   }
 
@@ -57,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
+        automaticallyImplyLeading: false, 
         title: Text('Login'),
       ),
       body: Center(
@@ -75,6 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(hintText: 'Password'),
+                obscureText: true,
               ),
             ),
             Padding(
@@ -103,12 +105,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if (response['reply'] == 'pass') {
         setState(() {
-          SnackBar snackBar = SnackBar(content: Text('Logged in successfully'));
-          _scaffoldKey.currentState.showSnackBar(snackBar);
+          //SnackBar snackBar = SnackBar(content: Text('Logged in successfully'));
+          //_scaffoldKey.currentState.showSnackBar(snackBar);
 
           spFunc.addStringToSF('username', _usernameController.text);
           spFunc.addStringToSF('commPass', response['commPass']);
-          Navigator.pushReplacementNamed(context, '/dashB');
+          
+          _usernameController.text = '';
+          _passwordController.text = '';
+          
+          Navigator.pushNamed(context, '/dashB');
         });
       } else {
         setState(() {

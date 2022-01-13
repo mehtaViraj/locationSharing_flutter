@@ -12,19 +12,23 @@ class _FriendsListState extends State<FriendsList> {
   //var username = spFunc.getStringValuesSF('username');
   //var commPass = spFunc.getStringValuesSF('commPass');
 
+  bool setStateBool =  true;
+
   static var username;
   static var commPass;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  Future<void> afterBuild() async {
+  Future<Map> _futureSF() async {
     username = await spFunc.getStringValuesSF('username');
     commPass = await spFunc.getStringValuesSF('commPass');
+
+    return {'username': username, 'commPass': commPass};
   }
 
-  Future<List<String>> _futureGetFriends = getFriends(username, commPass);
+  //Future<List<String>> _futureGetFriends = _getFriends(username, commPass);
 
-  static Future<List<String>> getFriends(username, commPass) async {
+  static Future<List<String>> _getFriends() async {
     var response = await spFunc.newPost({'user':username, 'commPass':commPass}, 'getfriends');
 
     List<String> ls;
@@ -48,9 +52,25 @@ class _FriendsListState extends State<FriendsList> {
 
   @override
   Widget build(BuildContext context) {
-    afterBuild();
+    return FutureBuilder<Map>(
+      future: _futureSF(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          //debugPrint('------------------------>${snapshot.data.toString()}');
+          return futureWidget();
+        } else if (snapshot.hasError) {
+          return Text("${snapshot.error}");
+        }
+        return CircularProgressIndicator();
+      },
+    );
+  }
+
+  Widget futureWidget() {
+    //afterBuild();
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text('Friends'),
         actions: <Widget>[
           IconButton(icon: Icon(Icons.refresh, size: 27,), onPressed: refresh)
@@ -58,7 +78,7 @@ class _FriendsListState extends State<FriendsList> {
       ),
       body: Center(
         child: FutureBuilder<List<String>>(
-          future: _futureGetFriends,
+          future: _getFriends(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               if (snapshot.data.length == 0) {
@@ -134,8 +154,6 @@ class _FriendsListState extends State<FriendsList> {
       context,
       MaterialPageRoute(
         builder: (context) => friendMap.FriendMap(),
-        // Pass the arguments as part of the RouteSettings. The
-        // DetailScreen reads the arguments from these settings.
         settings: RouteSettings(
           arguments: target,
         ),
@@ -145,7 +163,7 @@ class _FriendsListState extends State<FriendsList> {
 
   void refresh () {
     setState(() {
-      _futureGetFriends = getFriends(username, commPass);
+      setStateBool = !setStateBool;
     });
   }
 }
