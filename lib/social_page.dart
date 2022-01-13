@@ -56,87 +56,84 @@ class _SocialPageState extends State<SocialPage> {
     return Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          automaticallyImplyLeading: false,
           title: Text('Add Friends'),
         ),
         body: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Your Social Code:',
-                    style: TextStyle(fontSize: 23),
-                  ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Your Social Code:',
+                  style: TextStyle(fontSize: 23),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FutureBuilder(
-                        future: _futureGetSocialCode(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            if (snapshot.data['reply'] == 'pass') {
-                              return Text(
-                                snapshot.data['socialCode'],
-                                style: TextStyle(
-                                  fontSize: 35,
-                                  color: Colors.red,
-                                ),
-                              );
-                            }
-                          } else if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    FutureBuilder(
+                      future: _futureGetSocialCode(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          if (snapshot.data['reply'] == 'pass') {
+                            return Text(
+                              snapshot.data['socialCode'],
+                              style: TextStyle(
+                                fontSize: 35,
+                                color: Colors.red,
+                              ),
+                            );
                           }
-                          return CircularProgressIndicator();
-                        },
+                        } else if (snapshot.hasError) {
+                          return Text("${snapshot.error}");
+                        }
+                        return CircularProgressIndicator();
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: IconButton(
+                        icon: Icon(Icons.refresh),
+                        iconSize: 45,
+                        onPressed: changeSocialCode,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: IconButton(
-                          icon: Icon(Icons.refresh),
-                          iconSize: 45,
-                          onPressed: changeSocialCode,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        width: 200,
-                        child: TextField(
-                            controller: _addFriendsController,
-                            decoration: InputDecoration(
-                                hintText:
-                                "Friend's social code")
-                        ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      width: 200,
+                      child: TextField(
+                          controller: _addFriendsController,
+                          decoration: InputDecoration(
+                              hintText:
+                              "Friend's social code")
                       ),
-                      RaisedButton(
-                        child: Text('ADD'),
-                        onPressed: tryFriendAdd,
-                      ),
-                    ],
-                  ),
+                    ),
+                    RaisedButton(
+                      child: Text('ADD'),
+                      onPressed: tryFriendAdd,
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 200),
-                  child: RaisedButton(
-                    child: Text('LOG OUT'),
-                    onPressed: logOut,
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 200),
+                child: RaisedButton(
+                  child: Text('LOG OUT'),
+                  onPressed: logOut,
                 ),
-              ],
-            ),
-        ),
+              ),
+            ],
+          ),
         ),
     );
   }
@@ -169,14 +166,16 @@ class _SocialPageState extends State<SocialPage> {
   Future<void> logOut () async {
     spFunc.newPost({'user':username ,'commPass':commPass}, 'logout').then((Map response) {
       if (response['reply'] == 'pass') {
-        //SnackBar snackBar = SnackBar(content: Text('Logged Out, restart the app.'));
+        //SnackBar snackBar = SnackBar(content: Text('Logged Out'));
         //_scaffoldKey.currentState.showSnackBar(snackBar);
 
         spFunc.addStringToSF('username', 'null');
         spFunc.addStringToSF('commPass', 'null');
 
         int count = 0;
-        Navigator.pushReplacementNamed(context, '/');
+        Navigator.popUntil(context, (route) {
+          return count++ == 2;
+        });
       } else {
         SnackBar snackBar = SnackBar(content: Text(response['error']));
         _scaffoldKey.currentState.showSnackBar(snackBar);

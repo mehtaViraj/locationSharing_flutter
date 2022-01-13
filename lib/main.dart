@@ -4,9 +4,24 @@ import 'package:locationsharing/sign_up.dart' as signUp;
 import 'package:locationsharing/dashboard_builder.dart' as dashB;
 
 void main() {
-  runApp(MyApp());
+  runApp(MyAppWrap());
   spFunc.updateLocationCron();
 }
+
+class MyAppWrap extends StatefulWidget {
+  @override
+  _MyAppWrapState createState() => _MyAppWrapState();
+}
+
+class _MyAppWrapState extends State<MyAppWrap> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: MyApp(),
+    );
+  }
+}
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -57,7 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        automaticallyImplyLeading: false, 
         title: Text('Login'),
       ),
       body: Center(
@@ -76,7 +90,6 @@ class _MyHomePageState extends State<MyHomePage> {
               child: TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(hintText: 'Password'),
-                obscureText: true,
               ),
             ),
             Padding(
@@ -110,10 +123,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
           spFunc.addStringToSF('username', _usernameController.text);
           spFunc.addStringToSF('commPass', response['commPass']);
-          
-          _usernameController.text = '';
-          _passwordController.text = '';
-          
           Navigator.pushNamed(context, '/dashB');
         });
       } else {

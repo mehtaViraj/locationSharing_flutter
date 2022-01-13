@@ -70,7 +70,6 @@ class _FriendsListState extends State<FriendsList> {
     //afterBuild();
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         title: Text('Friends'),
         actions: <Widget>[
           IconButton(icon: Icon(Icons.refresh, size: 27,), onPressed: refresh)
